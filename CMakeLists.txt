@@ -1,0 +1,48 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(FSU)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CXX_EXTENSIONS NO)
+
+SET(INCLUDE_DIRS)
+SET(SOURCE_CPPS)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O -g -MMD -Werror=vla")
+set(CMAKE_EXE_LINKER_FLAGS "-lStringHash")
+
+add_subdirectory(Core)
+
+add_library(${PROJECT_NAME} ${SOURCE_CPPS})
+
+include_directories(${INCLUDE_DIRS})
+
+
+include(GNUInstallDirs)
+target_include_directories(${PROJECT_NAME}
+                           PUBLIC
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+#add_executable(TestFSU main.cpp)
+
+install(TARGETS ${PROJECT_NAME}
+        #EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
+#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/${PROJECT_NAME}
+#       INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
+
+list(LENGTH INCLUDE_DIRS TOTAL_INCLUDES)
+MATH(EXPR TOTAL_INCLUDES "${TOTAL_INCLUDES}-1")
+foreach(i RANGE ${TOTAL_INCLUDES})
+	list(GET INCLUDE_DIRS ${i} dir)
+	install(DIRECTORY ${dir}/ 
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+		FILES_MATCHING PATTERN "*.h"
+	)
+endforeach()
+
